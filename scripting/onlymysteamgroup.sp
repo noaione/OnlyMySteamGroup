@@ -101,7 +101,7 @@ void RefreshGroupIds()
 }
 
 
-public void SteamWorks_OnValidateClient(int ownerauthid, int authid)
+public int SteamWorks_OnValidateClient(int ownerauthid, int authid)
 {
 	for (int i = 0; i < g_iNumGroups; i++)
 	{
@@ -110,7 +110,7 @@ public void SteamWorks_OnValidateClient(int ownerauthid, int authid)
 }
 
 
-public void SteamWorks_OnClientGroupStatus(int accountId, int groupId, bool isMember, bool isOfficer)
+public int SteamWorks_OnClientGroupStatus(int accountId, int groupId, bool isMember, bool isOfficer)
 {
 	if (isMember)
 	{
