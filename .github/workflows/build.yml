@@ -1,0 +1,30 @@
+name: Build Plugin
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sm-version: ["1.10.x", "1.11.x"]
+
+    name: SM version ${{ matrix.sm-version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup SourcePawn
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: ${{ matrix.sm-version }}
+
+      - name: Build OnlyMySteamGroup
+        run: |
+          spcomp scripting/onlymysteamgroup.sp
+
+      - name: Upload Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: OnlyMySteamGroup_${{ matrix.sm-version }}
+          path: ${{ github.workspace }}
+
