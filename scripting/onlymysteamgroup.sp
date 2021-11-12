@@ -1,6 +1,6 @@
 #include <sourcemod>
 #include "include/autoexecconfig"
-#include <include/SteamWorks>
+#include "include/SteamWorks"
 
 #pragma semicolon 1
 #pragma newdecls required
