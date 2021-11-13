@@ -1,11 +1,12 @@
-#include <sourcemod>
-#include "include/autoexecconfig"
-#include "include/SteamWorks"
+#define PLUGIN_VERSION "0.1.0"
 
 #pragma semicolon 1
-#pragma newdecls required
+// #pragma newdecls required
 
-#define PLUGIN_VERSION "0.1.0"
+#include <sourcemod>
+#include <sdktools>
+
+#include "include/SteamWorks"
 
 public Plugin myinfo = 
 {
@@ -14,7 +15,7 @@ public Plugin myinfo =
     description = "Restrict your server for your steam group only.",
     version = PLUGIN_VERSION,
     url = "https://n4o.xyz/"
-};
+}
 
 ConVar g_hGroupIds;
 ConVar g_hKickReason;
@@ -25,17 +26,23 @@ char g_sKickReason[256];
 
 public void OnPluginStart()
 {
-    AutoExecConfig_SetFile("onlymysteamgroup");
-    AutoExecConfig_CreateConVar("sm_onlymysteamgroup_version", PLUGIN_VERSION, "Plugin version", FCVAR_PROTECTED|FCVAR_DONTRECORD);
+	g_hGroupIds = CreateConVar(
+		"onlymysteamgroup_groupids",
+		"",
+		"List of group ids separated by a comma. Use (groupId64 % 4294967296) to convert to expected input",
+		FCVAR_NOTIFY
+	);
+	g_hKickReason = CreateConVar(
+		"onlymysteamgroup_reason",
+		"You must join a certain Steam Group to join this server!",
+		"Kick reason displayed to client",
+		FCVAR_NOTIFY
+	);
+	CreateConVar("onlymysteamgroup_version", PLUGIN_VERSION, "Only My Steam Group plugin verison.", FCVAR_NOTIFY|FCVAR_DONTRECORD);
+	AutoExecConfig(true, "onlymysteamgroup");
 
-    g_hGroupIds = AutoExecConfig_CreateConVar("sm_onlymysteamgroup_groupids", "", "List of group ids separated by a comma. Use (groupd64 % 4294967296) to convert to expected input", FCVAR_PROTECTED);
-    g_hKickReason = AutoExecConfig_CreateConVar("sm_onlymysteamgroup_reason", "You must join a certain Steam Group to join this server!", "Kick reason displayed to client");
-
-    AutoExecConfig_ExecuteFile();
-    AutoExecConfig_CleanFile();
-
-    g_hGroupIds.AddChangeHook(OnCvarChanged);
-    g_hKickReason.AddChangeHook(OnCvarChanged);
+	g_hGroupIds.AddChangeHook(OnCvarChanged);
+	g_hKickReason.AddChangeHook(OnCvarChanged);
 }
 
 public void OnCvarChanged(Handle cvar, const char[] oldVal, const char[] newVal)
@@ -112,10 +119,11 @@ public int SteamWorks_OnValidateClient(int ownerauthid, int authid)
 
 public int SteamWorks_OnClientGroupStatus(int accountId, int groupId, bool isMember, bool isOfficer)
 {
-	if (isMember)
+	// Check if the client is in the group
+	if (!isMember && !isOfficer)
 	{
 		int client = GetClientOfAccountId(accountId);
-		if (client == -1)
+		if (client != -1)
 		{
             PrintNotifyMessageToAdmins(client);
             KickClient(client, g_sKickReason);
