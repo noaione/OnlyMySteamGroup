@@ -11,7 +11,10 @@ cp scripting/onlymysteamgroup.sp build/addons/sourcemod/scripting/
 cp scripting/include/SteamWorks.inc build/addons/sourcemod/scripting/include/
 
 # Pack files
-zip_name=$(echo "${GITHUB_REF/refs\/tags\//}")
-zip "${zip_name}.zip" build/
+if [[ $GITHUB_REF == refs/tags/* ]];
+then
+    zip_name=$(echo "${GITHUB_REF/refs\/tags\//}")
+    zip "${zip_name}.zip" build/
+fi
 
 echo "Done!"

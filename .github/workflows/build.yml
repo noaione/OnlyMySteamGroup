@@ -18,10 +18,6 @@ jobs:
         with:
           version: ${{ matrix.sm-version }}
 
-      - name: Build OnlyMySteamGroup
-        run: |
-          spcomp scripting/onlymysteamgroup.sp
-
       - name: Execute build script
         run: |
           chmod +x tools/build.sh
