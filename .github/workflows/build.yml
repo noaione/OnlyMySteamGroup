@@ -23,16 +23,24 @@ jobs:
           chmod +x tools/build.sh
           ./tools/build.sh
 
+      - name: Get the version
+        id: get_version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Upload Build
         uses: actions/upload-artifact@v2
         with:
           name: OnlyMySteamGroup_${{ matrix.sm-version }}
           path: build/
 
-      - name: Prepare
+      - name: Prepare release
         run: |
           ls -alh .
 
-      # - name: Release
-      #   uses: softprops/action-gh-release@v1
-      #   if: startsWith(github.ref, 'refs/tags/')
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files:
+            OnlyMySteamGroup_${{ steps.get_version.outputs.VERSION }}.zip
