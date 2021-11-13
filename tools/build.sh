@@ -1,4 +1,4 @@
-# Build script handling
+#!/bin/bash
 mkdir -p build/addons/sourcemod/{plugins,scripting}
 mkdir -p build/addons/sourcemod/scripting/include
 

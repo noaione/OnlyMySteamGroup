@@ -24,9 +24,8 @@ jobs:
 
       - name: Execute build script
         run: |
+          chmod +x tools/build.sh
           ./tools/build.sh
-        env:
-          includePath: /opt/hostedtoolcache/sourcepawn/1.10.6524/x64/include
 
       - name: Upload Build
         uses: actions/upload-artifact@v2
