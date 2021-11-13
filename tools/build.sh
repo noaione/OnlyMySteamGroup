@@ -14,7 +14,7 @@ cp scripting/include/SteamWorks.inc build/addons/sourcemod/scripting/include/
 if [[ $GITHUB_REF == refs/tags/* ]];
 then
     zip_version=$(echo "${GITHUB_REF/refs\/tags\//}")
-    zip "OnlyMySteamGroup_${zip_version}.zip" build/
+    zip -r "OnlyMySteamGroup_${zip_version}.zip" build
 fi
 
 echo "Done!"
