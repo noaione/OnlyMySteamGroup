@@ -1,10 +1,8 @@
-#define PLUGIN_VERSION "0.1.0"
+#define PLUGIN_VERSION "0.1.1"
 
 #pragma semicolon 1
-// #pragma newdecls required
 
 #include <sourcemod>
-#include <sdktools>
 
 #include "include/SteamWorks"
 
@@ -107,7 +105,6 @@ void RefreshGroupIds()
 	g_iNumGroups = count;
 }
 
-
 public int SteamWorks_OnValidateClient(int ownerauthid, int authid)
 {
 	for (int i = 0; i < g_iNumGroups; i++)
@@ -119,35 +116,43 @@ public int SteamWorks_OnValidateClient(int ownerauthid, int authid)
 
 public int SteamWorks_OnClientGroupStatus(int accountId, int groupId, bool isMember, bool isOfficer)
 {
+	LogMessage("GroupStatus: %d is in %d? %d (Admin? %d)", accountId, groupId, isMember, isOfficer);
 	// Check if the client is in the group
-	if (!isMember && !isOfficer)
+	if (!isMember)
 	{
+		LogMessage("Account %d is not in group %d, trying to fetch client", accountId, groupId);
 		int client = GetClientOfAccountId(accountId);
 		if (client != -1)
 		{
-            PrintNotifyMessageToAdmins(client);
-            KickClient(client, g_sKickReason);
+			LogMessage(
+				"Account %d is not in group %d (client %d), kicking client",
+				accountId, groupId, client
+			);
+			KickClient(client, g_sKickReason);
+			PrintNotifyMessageToAdmins(client);
 		}
 	}
 }
 
 void PrintNotifyMessageToAdmins(int client)
 {
-	for (int i=1; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (IsClientInGame(i) && CheckCommandAccess(i, "sm_onlymysteamgroup_admin", ADMFLAG_BAN)) 
+		if (IsClientInGame(i) && CheckCommandAccess(i, "onlymysteamgroup_admin", ADMFLAG_BAN)) 
 		{
 			PrintToChat(i, "\x04[SGR]\x01 %N was kicked because the person is not a member of defined group.", client);
 		}
 	}	
 }
 
-
 int GetClientOfAccountId(int accountId)
 {
-	for (int i=1; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (IsClientConnected(i) && GetSteamAccountID(i) == accountId)
+		bool isInGame = IsClientConnected(i);
+		int clientAccountId = GetSteamAccountID(i);
+		LogMessage("Checking client no %d for account %d (InGame %d)", i, accountId, isInGame, clientAccountId);
+		if (isInGame && clientAccountId == accountId)
 		{
 			return i;
 		}
