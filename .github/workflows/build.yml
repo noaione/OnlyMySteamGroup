@@ -22,9 +22,22 @@ jobs:
         run: |
           spcomp scripting/onlymysteamgroup.sp
 
+      - name: Execute build script
+        run: |
+          ./tools/build.sh
+        env:
+          includePath: /opt/hostedtoolcache/sourcepawn/1.10.6524/x64/include
+
       - name: Upload Build
         uses: actions/upload-artifact@v2
         with:
           name: OnlyMySteamGroup_${{ matrix.sm-version }}
-          path: ${{ github.workspace }}
+          path: build/
 
+      - name: Prepare
+        run: |
+          ls -alh .
+
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   if: startsWith(github.ref, 'refs/tags/')
